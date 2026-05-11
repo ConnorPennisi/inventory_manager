@@ -13,8 +13,18 @@
     "id": 2,
     "name": "Screwdriver Set",
     "category": "Tools",
-    "price": 18.5,
+    "price": 18.50,
     "stock": 8,
+    "sold": 0,
+    "low_stock_threshold": 5,
+    "created_by": "owner"
+  },
+  {
+    "id": 3,
+    "name": "Drill Bits Pack",
+    "category": "Hardware",
+    "price": 9.99,
+    "stock": 4,
     "sold": 0,
     "low_stock_threshold": 5,
     "created_by": "owner"
