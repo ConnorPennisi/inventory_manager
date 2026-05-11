@@ -33,17 +33,32 @@ def render_phase1_chatbot():
 
     if "chat_history" not in st.session_state:
         st.session_state.chat_history = []
+    if "latest_response" not in st.session_state:
+        st.session_state.latest_response = ""
 
-    question = st.selectbox(
-        "Ask a question",
-        [
-            "What items are low on stock?",
-            "What is the total number of products?",
-            "Which items have sold the most?",
-            "How many items are out of stock?",
-            "Show me all categories."
-        ]
-    )
+    top_col1, top_col2 = st.columns([3, 1])
+
+    with top_col1:
+        question = st.selectbox(
+            "Ask a question",
+            [
+                "What items are low on stock?",
+                "What is the total number of products?",
+                "Which items have sold the most?",
+                "How many items are out of stock?",
+                "Show me all categories."
+            ]
+        )
+
+    with top_col2:
+        st.write("")
+        st.write("")
+        clear = st.button("Clear Chat", use_container_width=True)
+
+    if clear:
+        st.session_state.chat_history = []
+        st.session_state.latest_response = ""
+        st.rerun()
 
     if st.button("Ask Assistant", use_container_width=True):
         inventory = get_inventory()
@@ -76,12 +91,22 @@ def render_phase1_chatbot():
             categories = sorted(set(item["category"] for item in inventory))
             answer = ", ".join(categories) if categories else "No categories found."
 
+        st.session_state.latest_response = answer
         st.session_state.chat_history.append({"role": "user", "content": question})
         st.session_state.chat_history.append({"role": "assistant", "content": answer})
+        st.rerun()
 
-    for message in st.session_state.chat_history:
-        with st.chat_message(message["role"]):
-            st.write(message["content"])
+    if st.session_state.latest_response:
+        st.info(f"Latest response: {st.session_state.latest_response}")
+
+    st.markdown("### Conversation")
+
+    if st.session_state.chat_history:
+        for message in st.session_state.chat_history:
+            with st.chat_message(message["role"]):
+                st.write(message["content"])
+    else:
+        st.caption("No messages yet.")
 
 
 def render_login_register():
