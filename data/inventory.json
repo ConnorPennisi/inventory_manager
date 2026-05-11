@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "name": "Hammer",
+    "category": "Tools",
+    "price": 12.99,
+    "stock": 20,
+    "sold": 0,
+    "low_stock_threshold": 5,
+    "created_by": "owner"
+  },
+  {
+    "id": 2,
+    "name": "Screwdriver Set",
+    "category": "Tools",
+    "price": 18.5,
+    "stock": 8,
+    "sold": 0,
+    "low_stock_threshold": 5,
+    "created_by": "owner"
+  }
+]
