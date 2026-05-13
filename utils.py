@@ -4,10 +4,8 @@ import streamlit as st
 def init_session_state():
     defaults = {
         "logged_in": False,
-        "user": None,
+        "current_user": None,
         "role": None,
-        "page": "login",
-        "selected_item_id": None,
         "flash_message": "",
         "flash_type": "info"
     }
@@ -19,21 +17,16 @@ def init_session_state():
 
 def login_session(user):
     st.session_state.logged_in = True
-    st.session_state.user = user
+    st.session_state.current_user = user
     st.session_state.role = user["role"]
-    st.session_state.page = "dashboard"
-    st.session_state.flash_message = f"Welcome, {user['name']}!"
-    st.session_state.flash_type = "success"
+    set_flash(f"Welcome, {user['name']}!", "success")
 
 
 def logout_session():
     st.session_state.logged_in = False
-    st.session_state.user = None
+    st.session_state.current_user = None
     st.session_state.role = None
-    st.session_state.page = "login"
-    st.session_state.selected_item_id = None
-    st.session_state.flash_message = "You have been logged out."
-    st.session_state.flash_type = "info"
+    set_flash("You have been logged out.", "info")
 
 
 def set_flash(message, message_type="info"):
@@ -42,13 +35,17 @@ def set_flash(message, message_type="info"):
 
 
 def show_flash():
-    if st.session_state.flash_message:
-        if st.session_state.flash_type == "success":
-            st.success(st.session_state.flash_message)
-        elif st.session_state.flash_type == "error":
-            st.error(st.session_state.flash_message)
-        else:
-            st.info(st.session_state.flash_message)
+    if not st.session_state.flash_message:
+        return
 
-        st.session_state.flash_message = ""
-        st.session_state.flash_type = "info"
+    if st.session_state.flash_type == "success":
+        st.success(st.session_state.flash_message)
+    elif st.session_state.flash_type == "error":
+        st.error(st.session_state.flash_message)
+    elif st.session_state.flash_type == "warning":
+        st.warning(st.session_state.flash_message)
+    else:
+        st.info(st.session_state.flash_message)
+
+    st.session_state.flash_message = ""
+    st.session_state.flash_type = "info"

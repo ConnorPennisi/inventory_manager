@@ -1,36 +1,121 @@
 import json
-import os
-from datetime import datetime
-
-USERS_FILE = "data/users.json"
-INVENTORY_FILE = "data/inventory.json"
-FLAGS_FILE = "data/flags.json"
+from pathlib import Path
 
 
-def ensure_file(path, default_data):
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    if not os.path.exists(path):
-        with open(path, "w", encoding="utf-8") as f:
-            json.dump(default_data, f, indent=2)
+DATA_DIR = Path("data")
+USERS_FILE = DATA_DIR / "users.json"
+INVENTORY_FILE = DATA_DIR / "inventory.json"
+FLAGS_FILE = DATA_DIR / "flags.json"
 
 
-def init_data_files():
-    ensure_file(USERS_FILE, [])
-    ensure_file(INVENTORY_FILE, [])
-    ensure_file(FLAGS_FILE, [])
+DEFAULT_USERS = [
+    {
+        "id": 1,
+        "name": "Owner Demo",
+        "username": "owner",
+        "password": "owner123",
+        "role": "owner"
+    },
+    {
+        "id": 2,
+        "name": "Employee Demo",
+        "username": "employee",
+        "password": "employee123",
+        "role": "employee"
+    }
+]
 
 
-def load_json(path):
-    with open(path, "r", encoding="utf-8") as f:
-        return json.load(f)
+DEFAULT_INVENTORY = [
+    {
+        "id": 1,
+        "name": "Hammer",
+        "category": "Tools",
+        "price": 12.99,
+        "stock": 20,
+        "sold": 0,
+        "low_stock_threshold": 5,
+        "created_by": "owner"
+    },
+    {
+        "id": 2,
+        "name": "Screwdriver Set",
+        "category": "Tools",
+        "price": 18.5,
+        "stock": 8,
+        "sold": 0,
+        "low_stock_threshold": 5,
+        "created_by": "owner"
+    },
+    {
+        "id": 3,
+        "name": "Drill Bits Pack",
+        "category": "Hardware",
+        "price": 9.99,
+        "stock": 4,
+        "sold": 0,
+        "low_stock_threshold": 5,
+        "created_by": "owner"
+    },
+    {
+        "id": 4,
+        "name": "Work Gloves",
+        "category": "Safety",
+        "price": 7.49,
+        "stock": 3,
+        "sold": 0,
+        "low_stock_threshold": 6,
+        "created_by": "owner"
+    },
+    {
+        "id": 5,
+        "name": "Tape Measure",
+        "category": "Tools",
+        "price": 11.25,
+        "stock": 15,
+        "sold": 0,
+        "low_stock_threshold": 5,
+        "created_by": "owner"
+    }
+]
 
 
-def save_json(path, data):
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2)
+def ensure_data_files():
+    DATA_DIR.mkdir(exist_ok=True)
+
+    if not USERS_FILE.exists():
+        save_json(USERS_FILE, DEFAULT_USERS)
+
+    if not INVENTORY_FILE.exists():
+        save_json(INVENTORY_FILE, DEFAULT_INVENTORY)
+
+    if not FLAGS_FILE.exists():
+        save_json(FLAGS_FILE, [])
 
 
-def get_users():
+def load_json(file_path):
+    if not file_path.exists():
+        return []
+
+    with open(file_path, "r", encoding="utf-8") as file:
+        return json.load(file)
+
+
+def save_json(file_path, data):
+    file_path.parent.mkdir(parents=True, exist_ok=True)
+
+    with open(file_path, "w", encoding="utf-8") as file:
+        json.dump(data, file, indent=4)
+
+
+def get_next_id(records):
+    if not records:
+        return 1
+
+    return max(record["id"] for record in records) + 1
+
+
+def load_users():
     return load_json(USERS_FILE)
 
 
@@ -38,89 +123,17 @@ def save_users(users):
     save_json(USERS_FILE, users)
 
 
-def get_inventory():
+def load_inventory():
     return load_json(INVENTORY_FILE)
 
 
-def save_inventory(items):
-    save_json(INVENTORY_FILE, items)
+def save_inventory(inventory):
+    save_json(INVENTORY_FILE, inventory)
 
 
-def get_flags():
+def load_flags():
     return load_json(FLAGS_FILE)
 
 
 def save_flags(flags):
     save_json(FLAGS_FILE, flags)
-
-
-def get_next_id(records):
-    if not records:
-        return 1
-    return max(record["id"] for record in records) + 1
-
-
-def add_inventory_item(name, category, price, stock, low_stock_threshold, created_by):
-    items = get_inventory()
-    item = {
-        "id": get_next_id(items),
-        "name": name.strip(),
-        "category": category.strip(),
-        "price": float(price),
-        "stock": int(stock),
-        "sold": 0,
-        "low_stock_threshold": int(low_stock_threshold),
-        "created_by": created_by
-    }
-    items.append(item)
-    save_inventory(items)
-
-
-def update_inventory_item(item_id, name, category, price, stock, low_stock_threshold):
-    items = get_inventory()
-    for item in items:
-        if item["id"] == item_id:
-            item["name"] = name.strip()
-            item["category"] = category.strip()
-            item["price"] = float(price)
-            item["stock"] = int(stock)
-            item["low_stock_threshold"] = int(low_stock_threshold)
-            break
-    save_inventory(items)
-
-
-def delete_inventory_item(item_id):
-    items = get_inventory()
-    updated_items = [item for item in items if item["id"] != item_id]
-    save_inventory(updated_items)
-
-
-def log_sale(item_id, quantity, employee_username):
-    items = get_inventory()
-
-    for item in items:
-        if item["id"] == item_id:
-            if quantity <= 0:
-                return False, "Quantity must be greater than 0."
-
-            if item["stock"] < quantity:
-                return False, "Not enough stock available."
-
-            item["stock"] -= quantity
-            item["sold"] += quantity
-            save_inventory(items)
-            return True, f"{employee_username} logged a sale of {quantity} for {item['name']}."
-
-    return False, "Item not found."
-
-
-def add_flag(item_id, flagged_by, reason):
-    flags = get_flags()
-    flags.append({
-        "id": get_next_id(flags),
-        "item_id": item_id,
-        "flagged_by": flagged_by,
-        "reason": reason.strip(),
-        "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    })
-    save_flags(flags)

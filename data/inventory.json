@@ -13,7 +13,7 @@
     "id": 2,
     "name": "Screwdriver Set",
     "category": "Tools",
-    "price": 18.50,
+    "price": 18.5,
     "stock": 8,
     "sold": 0,
     "low_stock_threshold": 5,
@@ -25,6 +25,26 @@
     "category": "Hardware",
     "price": 9.99,
     "stock": 4,
+    "sold": 0,
+    "low_stock_threshold": 5,
+    "created_by": "owner"
+  },
+  {
+    "id": 4,
+    "name": "Work Gloves",
+    "category": "Safety",
+    "price": 7.49,
+    "stock": 3,
+    "sold": 0,
+    "low_stock_threshold": 6,
+    "created_by": "owner"
+  },
+  {
+    "id": 5,
+    "name": "Tape Measure",
+    "category": "Tools",
+    "price": 11.25,
+    "stock": 15,
     "sold": 0,
     "low_stock_threshold": 5,
     "created_by": "owner"
